@@ -2,121 +2,20 @@
 using System.Media;
 using System.IO;
 using System.Threading;
-using CybersecurityAwarenessBot; // <-- Namespace for CyberBotUtils.cs
 
 namespace CybersecurityAwarenessBot
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            PlayGreetingSound();
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("********************************************");
-            Console.WriteLine("*  Welcome to the Cybersecurity Awareness  *");
-            Console.WriteLine("*                Chatbot                   *");
-            Console.WriteLine("********************************************");
-            Console.ResetColor();
-
-            TypingEffect("Hello! Welcome to the Cybersecurity Awareness Bot. I'm here to help you stay safe online.\n");
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("What's your name?");
-            Console.ResetColor();
-            string userName = Console.ReadLine();
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            TypingEffect($"Hi {userName}! I'm happy to assist you with your cybersecurity knowledge.");
-            Console.ResetColor();
-
-            DisplayAsciiArt();
-
-            Console.WriteLine("\nYou can ask me about cybersecurity, or type 'exit' to quit.\n");
-
-            string lastTopic = "";
-            while (true)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write($"{userName}: ");
-                string userInput = Console.ReadLine().ToLower();
-                Console.ResetColor();
-
-                if (string.IsNullOrWhiteSpace(userInput))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    TypingEffect("Please type something so I can help you.");
-                    Console.ResetColor();
-                    continue;
-                }
-
-                if (userInput == "exit" || userInput == "quit")
-                {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    TypingEffect("Goodbye, stay safe online!");
-                    Console.ResetColor();
-                    break;
-                }
-
-                Console.ForegroundColor = ConsoleColor.Cyan;
-
-                // 1. Detect cybersecurity topic keywords
-                string keywordResponse = CyberBotUtils.DetectKeyword(userInput);
-                if (keywordResponse != null)
-                {
-                    TypingEffect($"🔐 {keywordResponse}");
-                    lastTopic = userInput;
-                    Console.ResetColor();
-                    continue;
-                }
-
-                // 2. Sentiment detection
-                string sentiment = CyberBotUtils.DetectSentiment(userInput);
-                if (sentiment == "sad")
-                {
-                    TypingEffect("😟 I'm here for you. Want to hear a cybersecurity tip?");
-                    Console.ResetColor();
-                    continue;
-                }
-                else if (sentiment == "happy")
-                {
-                    TypingEffect("😊 I'm glad you're feeling good! Let's talk about staying safe online.");
-                    Console.ResetColor();
-                    continue;
-                }
-
-                // 3. General questions (purpose, mood, etc.)
-                if (userInput.Contains("how are you"))
-                {
-                    TypingEffect(CyberBotUtils.GetRandomResponse(CyberBotUtils.MoodResponses));
-                }
-                else if (userInput.Contains("what's your purpose") || userInput.Contains("what is your purpose"))
-                {
-                    TypingEffect("My purpose is to help you stay safe online and raise awareness about cybersecurity.");
-                }
-                else if (userInput.Contains("what can i ask you about"))
-                {
-                    TypingEffect("You can ask me about password safety, phishing, safe browsing, and more!");
-                }
-                else
-                {
-                    TypingEffect("🤖 I'm not sure I understand. Try asking about password safety, phishing, or safe browsing.");
-                }
-
-                Console.ResetColor();
-            }
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            TypingEffect("Thanks for chatting with me! Stay safe online.");
-            Console.ResetColor();
-        }
+        static string userName = "";
+        static string lastTopic = "";
 
         static void TypingEffect(string message)
         {
             foreach (char letter in message)
             {
                 Console.Write(letter);
-                Thread.Sleep(50); // Typing speed
+                Thread.Sleep(30); // faster typing effect
             }
             Console.WriteLine();
         }
@@ -133,28 +32,102 @@ namespace CybersecurityAwarenessBot
                 }
                 else
                 {
-                    Console.WriteLine("Greeting sound file not found.");
+                    Console.WriteLine("🔇 Greeting sound file not found.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error playing greeting sound: " + ex.Message);
+                Console.WriteLine("Error playing the greeting sound: " + ex.Message);
             }
         }
 
-        static void DisplayAsciiArt()
+        static void Main(string[] args)
         {
-            string asciiPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "ascii_logo.txt");
-            if (File.Exists(asciiPath))
+            Console.Title = "Cybersecurity Awareness Bot";
+            PlayGreetingSound();
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("********************************************");
+            Console.WriteLine("*  Welcome to the Cybersecurity Awareness  *");
+            Console.WriteLine("*                Chatbot 🤖               *");
+            Console.WriteLine("********************************************");
+            Console.ResetColor();
+
+            TypingEffect("Hello! I'm your Cybersecurity Awareness Bot 🤖");
+            Console.WriteLine();
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("What's your name? ");
+            Console.ResetColor();
+            userName = Console.ReadLine()?.Trim();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            TypingEffect($"Hi {userName}, happy to have you here! 💡");
+            Console.ResetColor();
+
+            TypingEffect("Ask me anything about cybersecurity (e.g., phishing, password safety). Type 'exit' anytime to leave.\n");
+
+            bool continueChat = true;
+
+            while (continueChat)
             {
-                string asciiArt = File.ReadAllText(asciiPath);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(asciiArt);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("🧠 You: ");
                 Console.ResetColor();
-            }
-            else
-            {
-                Console.WriteLine("ASCII art not found.");
+                string userInput = Console.ReadLine()?.Trim().ToLower();
+
+                if (string.IsNullOrWhiteSpace(userInput))
+                {
+                    TypingEffect("🤔 I didn't catch that. Can you try again?");
+                    continue;
+                }
+
+                if (userInput == "exit")
+                {
+                    TypingEffect("👋 Goodbye! Stay safe online!");
+                    break;
+                }
+
+                // Check sentiment
+                string mood = CyberBotUtils.DetectMood(userInput);
+                if (!string.IsNullOrEmpty(mood))
+                {
+                    TypingEffect(mood);
+                }
+
+                // Get cyber response
+                string response = CyberBotUtils.GetCyberResponse(userInput);
+                if (!string.IsNullOrEmpty(response))
+                {
+                    TypingEffect(response);
+                    lastTopic = userInput; // memory recall
+                }
+                else
+                {
+                    TypingEffect("❓ I didn't understand that. Try asking me about topics like 'safe browsing', 'malware', or 'password safety'.");
+                }
+
+                // Conversation Flow
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.Write("\n🔄 Would you like to continue? (yes/no): ");
+                Console.ResetColor();
+                string continueInput = Console.ReadLine()?.Trim().ToLower();
+
+                if (continueInput == "no" || continueInput == "n")
+                {
+                    TypingEffect("✅ Alright, goodbye for now! Stay cyber safe! 🔐");
+                    continueChat = false;
+                }
+                else if (continueInput == "yes" || continueInput == "y")
+                {
+                    if (!string.IsNullOrEmpty(lastTopic))
+                    {
+                        TypingEffect($"Great! Let me know if you want to dive deeper into '{lastTopic}' 🧐");
+                    }
+                }
+                else
+                {
+                    TypingEffect("🤖 I’ll assume you want to continue. Let’s keep going!\n");
+                }
             }
         }
     }

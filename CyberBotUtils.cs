@@ -1,74 +1,100 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CybersecurityAwarenessBot
 {
     public static class CyberBotUtils
     {
-        // Keyword-based cybersecurity facts
-        public static Dictionary<string, string> KeywordResponses = new Dictionary<string, string>
-        {
-            { "password", "Make sure your password is at least 12 characters long and unique." },
-            { "phishing", "Phishing is a scam where attackers trick you into revealing personal info." },
-            { "safe browsing", "Always check the URL and use HTTPS websites when entering sensitive info." },
-            { "malware", "Malware is software that is designed to damage or disable computers." },
-            { "firewall", "A firewall helps protect your computer by filtering incoming and outgoing traffic." }
-        };
+        // Random generator for variety
+        static Random rnd = new Random();
 
-        // Sentiment keyword banks
-        public static List<string> SadWords = new List<string> { "sad", "tired", "upset", "angry", "frustrated", "depressed" };
-        public static List<string> HappyWords = new List<string> { "happy", "excited", "great", "good", "amazing" };
-
-        // Mood responses for variety
-        public static List<string> MoodResponses = new List<string>
+        // Detect basic positive/negative sentiment
+        public static string DetectMood(string input)
         {
-            "I'm doing great! Staying safe online, as always.",
-            "All systems operational. How about you?",
-            "I'm feeling cyber-secure today!"
-        };
+            string lowerInput = input.ToLower();
+            string[] positiveWords = { "good", "great", "awesome", "fine", "okay", "happy", "well" };
+            string[] negativeWords = { "bad", "sad", "tired", "angry", "upset", "mad", "frustrated" };
 
-        // Get a random response from a list
-        public static string GetRandomResponse(List<string> responses)
-        {
-            Random rnd = new Random();
-            int index = rnd.Next(responses.Count);
-            return responses[index];
-        }
-
-        // Check if input contains any keyword (case insensitive)
-        public static string DetectKeyword(string input)
-        {
-            foreach (var keyword in KeywordResponses)
+            foreach (string word in positiveWords)
             {
-                if (input.ToLower().Contains(keyword.Key))
+                if (lowerInput.Contains(word))
                 {
-                    return keyword.Value;
+                    return "😊 I'm glad you're feeling " + word + "!";
                 }
             }
-            return null; // No keyword matched
+
+            foreach (string word in negativeWords)
+            {
+                if (lowerInput.Contains(word))
+                {
+                    return "😟 I'm sorry you're feeling " + word + ". Cyber safety matters even on tough days.";
+                }
+            }
+
+            return "";
         }
 
-        // Detect mood (basic sentiment)
-        public static string DetectSentiment(string input)
+        // Categorized response generator
+        public static string GetCyberResponse(string input)
         {
             input = input.ToLower();
 
-            foreach (var word in SadWords)
+            if (input.Contains("phishing"))
             {
-                if (input.Contains(word))
-                    return "sad";
+                string[] replies = {
+                    "🎣 Phishing is when attackers trick you into giving personal info via fake emails or websites.",
+                    "Beware of phishing scams — never click suspicious links or attachments!",
+                    "Phishing often looks like legit emails from banks or stores. Always verify the source!"
+                };
+                return GetRandomReply(replies);
+            }
+            else if (input.Contains("password"))
+            {
+                string[] replies = {
+                    "🔑 Use a strong password with a mix of letters, numbers, and symbols!",
+                    "Never reuse the same password across multiple sites.",
+                    "Consider using a password manager to keep your logins secure."
+                };
+                return GetRandomReply(replies);
+            }
+            else if (input.Contains("malware") || input.Contains("virus"))
+            {
+                string[] replies = {
+                    "🛡️ Malware is harmful software that can damage or spy on your system.",
+                    "Keep your antivirus software up to date to protect against malware.",
+                    "Avoid downloading files from unknown or shady websites."
+                };
+                return GetRandomReply(replies);
+            }
+            else if (input.Contains("safe browsing") || input.Contains("web safety"))
+            {
+                string[] replies = {
+                    "🌐 Always make sure websites use HTTPS before entering personal info.",
+                    "Be cautious about clicking popups or banners, especially on unfamiliar sites.",
+                    "Use browser security features and ad blockers to improve web safety."
+                };
+                return GetRandomReply(replies);
+            }
+            else if (input.Contains("2fa") || input.Contains("two factor"))
+            {
+                return "🧪 2FA (Two-Factor Authentication) adds an extra layer of security using your phone or app to verify it's you.";
+            }
+            else if (input.Contains("firewall"))
+            {
+                return "🧱 A firewall monitors incoming and outgoing traffic — it's like a bouncer for your network.";
+            }
+            else if (input.Contains("vpn"))
+            {
+                return "🕵️ A VPN hides your IP and encrypts your internet activity, making public Wi-Fi safer to use.";
             }
 
-            foreach (var word in HappyWords)
-            {
-                if (input.Contains(word))
-                    return "happy";
-            }
+            return "";
+        }
 
-            return "neutral";
+        private static string GetRandomReply(string[] replies)
+        {
+            int index = rnd.Next(replies.Length);
+            return replies[index];
         }
     }
 }
