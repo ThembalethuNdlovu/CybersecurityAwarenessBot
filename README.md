@@ -42,8 +42,8 @@ CybersecurityChatbot/
 5. Run the app (`Ctrl + F5`).
 
 ## ✅ GitHub Actions
-
-This project includes a simple GitHub Actions workflow (`.github/workflows/dotnet.yml`) for CI that:
+Link to repossitory: https://github.com/ThembalethuNdlovu/CybersecurityAwarenessBot/tree/Part-2
+This project includes a simple GitHub Actions workflow for CI that:
 - Builds the project
 - Checks for errors
 - Passes if the chatbot compiles and runs successfully
