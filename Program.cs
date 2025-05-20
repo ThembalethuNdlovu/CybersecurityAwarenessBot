@@ -2,35 +2,134 @@
 using System.Media;
 using System.IO;
 using System.Threading;
+using CybersecurityAwarenessBot; // <-- Namespace for CyberBotUtils.cs
 
 namespace CybersecurityAwarenessBot
 {
     class Program
     {
-        // Method to simulate the typing effect
+        static void Main(string[] args)
+        {
+            PlayGreetingSound();
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("********************************************");
+            Console.WriteLine("*  Welcome to the Cybersecurity Awareness  *");
+            Console.WriteLine("*                Chatbot                   *");
+            Console.WriteLine("********************************************");
+            Console.ResetColor();
+
+            TypingEffect("Hello! Welcome to the Cybersecurity Awareness Bot. I'm here to help you stay safe online.\n");
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("What's your name?");
+            Console.ResetColor();
+            string userName = Console.ReadLine();
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            TypingEffect($"Hi {userName}! I'm happy to assist you with your cybersecurity knowledge.");
+            Console.ResetColor();
+
+            DisplayAsciiArt();
+
+            Console.WriteLine("\nYou can ask me about cybersecurity, or type 'exit' to quit.\n");
+
+            string lastTopic = "";
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write($"{userName}: ");
+                string userInput = Console.ReadLine().ToLower();
+                Console.ResetColor();
+
+                if (string.IsNullOrWhiteSpace(userInput))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TypingEffect("Please type something so I can help you.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                if (userInput == "exit" || userInput == "quit")
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    TypingEffect("Goodbye, stay safe online!");
+                    Console.ResetColor();
+                    break;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+
+                // 1. Detect cybersecurity topic keywords
+                string keywordResponse = CyberBotUtils.DetectKeyword(userInput);
+                if (keywordResponse != null)
+                {
+                    TypingEffect($"🔐 {keywordResponse}");
+                    lastTopic = userInput;
+                    Console.ResetColor();
+                    continue;
+                }
+
+                // 2. Sentiment detection
+                string sentiment = CyberBotUtils.DetectSentiment(userInput);
+                if (sentiment == "sad")
+                {
+                    TypingEffect("😟 I'm here for you. Want to hear a cybersecurity tip?");
+                    Console.ResetColor();
+                    continue;
+                }
+                else if (sentiment == "happy")
+                {
+                    TypingEffect("😊 I'm glad you're feeling good! Let's talk about staying safe online.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                // 3. General questions (purpose, mood, etc.)
+                if (userInput.Contains("how are you"))
+                {
+                    TypingEffect(CyberBotUtils.GetRandomResponse(CyberBotUtils.MoodResponses));
+                }
+                else if (userInput.Contains("what's your purpose") || userInput.Contains("what is your purpose"))
+                {
+                    TypingEffect("My purpose is to help you stay safe online and raise awareness about cybersecurity.");
+                }
+                else if (userInput.Contains("what can i ask you about"))
+                {
+                    TypingEffect("You can ask me about password safety, phishing, safe browsing, and more!");
+                }
+                else
+                {
+                    TypingEffect("🤖 I'm not sure I understand. Try asking about password safety, phishing, or safe browsing.");
+                }
+
+                Console.ResetColor();
+            }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            TypingEffect("Thanks for chatting with me! Stay safe online.");
+            Console.ResetColor();
+        }
+
         static void TypingEffect(string message)
         {
             foreach (char letter in message)
             {
                 Console.Write(letter);
-                Thread.Sleep(100); // Adjust the speed of typing effect
+                Thread.Sleep(50); // Typing speed
             }
             Console.WriteLine();
         }
 
-        // Method to play the voice greeting
         static void PlayGreetingSound()
         {
             try
             {
-                // Get the path to the WAV file relative to the project's output directory
                 string audioFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "greeting.wav");
-
-                // Check if the file exists before trying to play it
                 if (File.Exists(audioFilePath))
                 {
                     SoundPlayer player = new SoundPlayer(audioFilePath);
-                    player.PlaySync(); // PlaySync ensures the greeting plays before moving forward
+                    player.PlaySync();
                 }
                 else
                 {
@@ -39,135 +138,24 @@ namespace CybersecurityAwarenessBot
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error playing the greeting sound: " + ex.Message);
+                Console.WriteLine("Error playing greeting sound: " + ex.Message);
             }
         }
 
-        static void Main(string[] args)
+        static void DisplayAsciiArt()
         {
-            // Play the voice greeting
-            PlayGreetingSound();
-
-            // Add a border with color
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("********************************************");
-            Console.WriteLine("*  Welcome to the Cybersecurity Awareness  *");
-            Console.WriteLine("*                Chatbot                   *");
-            Console.WriteLine("********************************************");
-            Console.ResetColor();
-
-            // Simulate typing effect for greeting
-            TypingEffect("Hello! Welcome to the Cybersecurity Awareness Bot. I'm here to help you stay safe online.");
-
-            // Spacing
-            Console.WriteLine();
-
-            // Ask for user's name
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("What's your name?");
-            Console.ResetColor();
-
-            string userName = Console.ReadLine();
-
-            // Personalized greeting
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            TypingEffect($"Hi {userName}! I'm happy to assist you with your cybersecurity knowledge.");
-            Console.ResetColor();
-
-            // Display ASCII Art (Cybersecurity Awareness Bot Logo)
-            Console.WriteLine(@"@@@@@%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@@@@%%%%%%%%%%%%%%%%%%%%%%%%%#-%%%%%%%=%%%%%%%##%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@
-@@@@%%%%%%%%%%%%%%%%%%%%%%%%%%#%%===%%%%%%#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@
-%%@@%%%%%%%%%%%%%%%%%%%%%%%*%%#%#+#:#%%%*%+%+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@
-%%%%%%%%%%%%%%%%%%%%%%%%*##*%%#%%+:#%%%%%*%#+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@
-%%%%%%%%%%%%%%%%%%%%%%#+*##*#%*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@
-%%%%%%%%%%%%%%%%%%%+#%#+*##*#%##%####%################################%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@
-%%%%%%%%%%%%%%+%%#%+#%#+*##*#%#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#%%%%%%%%%%+=*+*%#++==%%==+#==#%%%%%%%%##%%%%%%%%%%%@@@@@@@@@@@@@@@@@@
-%%%%%%%%%%%%%%%%#=%%%%%%%%%%%%#%%%%%%%%%-%%%%+#+%-%*=%=%%#*#:%%%%%%%%##%%%%%%%%%%%@@@@@@@@@@@@@@@@@@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#%%%%%%%%%-%%%%%.%%-%%-#+%%#*+*%%%%%%%%#%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@
-%%%%%%%%%%%%%%%%%%%%*######+%%#%%%%%%%%%%##%%%#%%%##%%##%%%%%%%%%%%%%#%%*%%*%%%%@@@@@@@@@@@@@@@@@@@@
-@@@%%%%%%%%%%%-##=%%*@%%%%%+%%#%%%%%%%%%%#%%##%%%%%%%*#%%##****%%#%%%#%%*%%*%%%%%%@@@@@@@@@@@@@@@@@@
-@@@@@@@%%%%%%%@@%%%%********%%#%%%#-%#%:%%%-%%#=#%#**#%:%:%*+%%=**%%%#%%%%%+%%%@@%@@@@@@@@@@@@@@@@@@
-@@@@@@@%%%%%%%%%%%%%*+*****#%%#%%%%%*:#:##*=%%%=#%****=#%:%*+%%*-%%%%#%%%%%%%%@@@%@@@@@@%@@@@@@@@@@@
-@@@@@@@@%%@%@%@@%%%%%%%%%%%%%%#%%%#=-*%--=##==#%*=*%#%%*#*%%#%%%#%%%%%%%#%%@%%@@@%@@@@@@@@@@@@@@%#+=
-@@@@@@@@@@%%*%%%#=%%%%%%%%%*%%#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+#+*@@%%-==-%@@@#+-=-----
-@@@@@@@@@@@@@@@@%%@@%%++%%%%%%#%%%%%%%%%%%%%%%%%%%%%%%%%%%%###########%@%%#%%**@@%@%++@@@+----=====+
-@@@@@@@@@@@@@@@@@%@%*....+@%%%%%%%%%%%%%%%%@%%@%%%%%%%%%%%%%%%#%%%%%%%%%%@@%+#@@@%@@@@@#:---=+*#*+**
-@@@@@@@@@@@@@@@@@@@@+=:=:+@%@%@*%%##%#*%#=%#=#%=+%%*%%%%%%%%%%-#%%%%%-#@+%**%%#%@@@@@@=---=+*#*=++*#
-@@@@@@@@@@@@@@@@@@@@+:-@=*@%@@%+#%*#%#*%%*%%*%%#%@@%%@%%%%%%%%%@@%%@%%@@@@@%@%@@@@@@+---=*##*--=+*#%
-@@@@@@@@@@@@@@@@@%#%%%%%%%%+%%%%%%%%%%#*%%%%%%%%%%%#%@##%@##%@%@@@%+=..:%@@@@+%@%@*--==+#%@#--=++*#%
-@@@@@@@@@@@@@@@@@@@@%#####@%@@@%*#**%%%%%%%%:.*%%%%%%%*%*-%*%%#%%=......-#%%%#%@%---+*#%@@%===+*#***
-@@@@@@@@@@@@@@@@@@@@+=====%%%%%*#**#+######=..:=#######=##*#####*.......-#%%%%%%%++*%%%%%%%++*###***
-@@@@@@@@@@%%%%%%%%%%#*****%%%%%*#+*+######+#*-##-#######*+####*#############%%%%%===+*%%%%%######%%%
-@@@@@@@@@@@@@@%###%%%%%%%%%#%%%%%*##%#####+++**###################%%%#%%%%#########%%%%@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@@@%#*#%%%####%%%%@@@%%%%#####*#**###%%%@@@@@@@@@@%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-");
-
-            // Text-based greeting and user interaction
-            Console.WriteLine("\nI'm here to help you stay safe online.");
-            Console.WriteLine("\nAsk me about cybersecurity, or type 'exit' to quit.");
-
-            // Basic Response System
-            while (true)
+            string asciiPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "ascii_logo.txt");
+            if (File.Exists(asciiPath))
             {
-                string userInput = Console.ReadLine().ToLower();
-
-                // Handle exit condition
-                if (userInput == "exit")
-                {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    TypingEffect("Goodbye, stay safe online!");
-                    break;
-                }
-
-                // Respond to common questions
-                if (userInput.Contains("how are you"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    TypingEffect("I'm just a bot, but I'm doing great! How can I assist you?");
-                }
-                else if (userInput.Contains("what's your purpose"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    TypingEffect("My purpose is to help you stay safe online and raise awareness about cybersecurity.");
-                }
-                else if (userInput.Contains("what can i ask you about"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    TypingEffect("You can ask me about password safety, phishing, safe browsing, and more!");
-                }
-                else if (userInput.Contains("password safety"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    TypingEffect("It's important to use strong passwords and change them regularly. Avoid using the same password across multiple sites.");
-                }
-                else if (userInput.Contains("phishing"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    TypingEffect("Phishing emails try to trick you into giving away personal information. Always verify the sender before clicking links or downloading attachments.");
-                }
-                else if (userInput.Contains("safe browsing"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    TypingEffect("Make sure to use HTTPS websites and avoid clicking on suspicious links. Keep your browser and software updated.");
-                }
-                else
-                {
-                    // Handle unsupported input
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    TypingEffect("I didn't quite understand that. Could you rephrase?");
-                }
-
-                // Reset color after each interaction
+                string asciiArt = File.ReadAllText(asciiPath);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(asciiArt);
                 Console.ResetColor();
             }
-
-            // End the program
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            TypingEffect("Thanks for chatting with me! Stay safe online.");
-            Console.ResetColor();
+            else
+            {
+                Console.WriteLine("ASCII art not found.");
+            }
         }
     }
 }
